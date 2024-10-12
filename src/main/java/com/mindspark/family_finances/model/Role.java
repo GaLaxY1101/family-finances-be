@@ -28,8 +28,8 @@ public class Role implements GrantedAuthority {
         return name.name();
     }
 
-    public enum RoleName {
-        CHILD,
-        PARENT
-    }
+//    public enum RoleName {
+//        CHILD,
+//        PARENT
+//    }
 }
