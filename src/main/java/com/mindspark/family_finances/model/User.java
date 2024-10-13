@@ -9,10 +9,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Data
@@ -28,27 +26,27 @@ public class User implements UserDetails {
     private Long id;
 
     @Column(nullable = false)
-    private String firstName;
+    private String firstname;
 
     @Column(nullable = false)
-    private String lastName;
+    private String lastname;
 
     @Column(nullable = false)
-    private String userpassword;
+    private String password;
 
-    @Column(nullable = false)
-    private String phoneNumber;
+//    @Column(nullable = false)
+//    private String phoneNumber;
 
     @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false)
-    private LocalDate dateOfBirth;
-
-    @OneToMany(
-            mappedBy = "user"
-    )
-    private Set<Card> cards;
+//    @Column(nullable = false)
+//    private LocalDate dateOfBirth;
+//
+//    @OneToMany(
+//            mappedBy = "user"
+//    )
+//    private Set<Card> cards;
 
     @Enumerated(EnumType.STRING)
     private RoleName role;
@@ -68,7 +66,7 @@ public class User implements UserDetails {
 
     @Override
     public String getPassword() {
-        return userpassword;
+        return password;
     }
 
     @Override
