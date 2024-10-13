@@ -25,6 +25,10 @@ public class AuthenticationService {
     public AuthenticationResponse register(RegisterRequest request) {
         System.out.println("Registering user: " + request.getEmail());
 
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new UserAlreadyExistsException("User with email " + request.getEmail() + " already exists.");
+        }
+
         var user = User.builder()
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())
@@ -32,13 +36,16 @@ public class AuthenticationService {
                 .password(encoder.encode(request.getPassword()))
                 .role(RoleName.PARENT)
                 .build();
+
         userRepository.save(user);
         var jwtToken = jwtService.generateToken(user);
+
         return AuthenticationResponse
                 .builder()
                 .token(jwtToken)
                 .build();
     }
+
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(
