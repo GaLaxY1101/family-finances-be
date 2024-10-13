@@ -34,29 +34,13 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-//    @Column(nullable = false)
-//    private String phoneNumber;
 
     @Column(nullable = false)
     private String email;
 
-//    @Column(nullable = false)
-//    private LocalDate dateOfBirth;
-//
-//    @OneToMany(
-//            mappedBy = "user"
-//    )
-//    private Set<Card> cards;
-
     @Enumerated(EnumType.STRING)
     private RoleName role;
-//    @ManyToMany
-//    @JoinTable(
-//            name = "users_roles",
-//            joinColumns = @JoinColumn(name = "user_id"),
-//            inverseJoinColumns = @JoinColumn(name = "role_id")
-//    )
-//    private Set<Role> roles;
+
 
 
     @Override

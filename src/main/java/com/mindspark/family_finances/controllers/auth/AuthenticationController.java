@@ -1,6 +1,6 @@
 package com.mindspark.family_finances.controllers.auth;
 
-import com.mindspark.family_finances.services.AuthenticationService;
+import com.mindspark.family_finances.services.authService.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
