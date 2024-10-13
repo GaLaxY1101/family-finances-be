@@ -23,10 +23,9 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
-        System.out.println("Registering user: " + request.getEmail());
 
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new UserAlreadyExistsException("User with email " + request.getEmail() + " already exists.");
+            throw new UserAlreadyExistsException("User with email already exists.");
         }
 
         var user = User.builder()

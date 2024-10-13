@@ -1,7 +1,6 @@
 package com.mindspark.family_finances.services;
 
 import com.mindspark.family_finances.repository.UserRepository;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
