@@ -1,9 +1,8 @@
 package com.mindspark.family_finances.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -12,8 +11,11 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -30,11 +32,9 @@ public class BankAccount {
     private Double availableBalance;
 
     @Column(nullable = false)
-    private Double totalBalance;
+    private Double totalBalance = 0.0;
 
-    @OneToMany(
-            mappedBy = "bankAccount"
-    )
+    @OneToMany(mappedBy = "bankAccount")
     private Set<Card> cards;
 
     @Column(nullable = false)
@@ -43,27 +43,40 @@ public class BankAccount {
     @Column(nullable = false)
     private LocalDate createdAt;
 
-    @ManyToMany(
-        mappedBy = "bankAccounts"
-    )
-    private Set<User> users;
+    @ManyToMany(mappedBy = "bankAccounts")
+    @JsonManagedReference
+    private Set<User> users = new HashSet<>();
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Type type;
-
-    private enum Type{
-        FAMILY,
-        PERSONAL
-    }
-
-    private void addUser(User user){
+    public void addUser(User user) {
         users.add(user);
         user.getBankAccounts().add(this);
     }
 
-    private void removeUser(User user){
+    public void removeUser(User user) {
         users.remove(user);
         user.getBankAccounts().remove(this);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BankAccount)) return false;
+        BankAccount that = (BankAccount) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "BankAccount{" +
+                "id=" + id +
+                ", availableBalance=" + availableBalance +
+                ", totalBalance=" + totalBalance +
+                '}';
+    }
 }
+

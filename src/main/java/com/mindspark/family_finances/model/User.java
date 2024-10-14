@@ -1,17 +1,13 @@
 package com.mindspark.family_finances.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Data
@@ -19,8 +15,8 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(exclude = {"bankAccounts"})
 public class User implements UserDetails {
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
     @SequenceGenerator(name = "user_seq", sequenceName = "user_sequence", allocationSize = 5)
@@ -35,7 +31,6 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-
     @Column(nullable = false)
     private String email;
 
@@ -45,12 +40,18 @@ public class User implements UserDetails {
     @ManyToMany
     @JoinTable(
             name = "bank_account_user",
-            joinColumns = @JoinColumn(name = "bank_account_id"),
-            foreignKey = @ForeignKey(name = "fk_bank_account_user_bank_account_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"),
-            inverseForeignKey = @ForeignKey(name = "fk_bank_account_user_user_id")
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "bank_account_id"),
+            foreignKey = @ForeignKey(name = "fk_bank_account_user_user_id"),
+            inverseForeignKey = @ForeignKey(name = "fk_bank_account_user_bank_account_id")
     )
-    private Set<BankAccount> bankAccounts;
+    @JsonBackReference
+    private Set<BankAccount> bankAccounts = new HashSet<>();
+
+    public void addBankAccount(BankAccount bankAccount) {
+            this.bankAccounts.add(bankAccount);
+            bankAccount.getUsers().add(this);
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -86,4 +87,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }
