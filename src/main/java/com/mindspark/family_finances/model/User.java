@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -41,7 +42,15 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private RoleName role;
 
-
+    @ManyToMany
+    @JoinTable(
+            name = "bank_account_user",
+            joinColumns = @JoinColumn(name = "bank_account_id"),
+            foreignKey = @ForeignKey(name = "fk_bank_account_user_bank_account_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"),
+            inverseForeignKey = @ForeignKey(name = "fk_bank_account_user_user_id")
+    )
+    private Set<BankAccount> bankAccounts;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

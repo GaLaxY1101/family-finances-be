@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
@@ -42,6 +43,11 @@ public class BankAccount {
     @Column(nullable = false)
     private LocalDate createdAt;
 
+    @ManyToMany(
+        mappedBy = "bankAccounts"
+    )
+    private Set<User> users;
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Type type;
@@ -49,5 +55,15 @@ public class BankAccount {
     private enum Type{
         FAMILY,
         PERSONAL
+    }
+
+    private void addUser(User user){
+        users.add(user);
+        user.getBankAccounts().add(this);
+    }
+
+    private void removeUser(User user){
+        users.remove(user);
+        user.getBankAccounts().remove(this);
     }
 }
