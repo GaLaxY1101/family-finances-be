@@ -1,4 +1,4 @@
-package com.mindspark.family_finances.controllers.auth.errorException;
+package com.mindspark.family_finances.exception;
 
 import lombok.Data;
 

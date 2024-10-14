@@ -1,4 +1,4 @@
-package com.mindspark.family_finances.controllers;
+package com.mindspark.family_finances.dto;
 
 import lombok.Data;
 
