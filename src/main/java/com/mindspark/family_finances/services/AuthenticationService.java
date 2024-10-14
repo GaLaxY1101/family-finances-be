@@ -1,12 +1,13 @@
-package com.mindspark.family_finances.services.authService;
+package com.mindspark.family_finances.services;
 
-import com.mindspark.family_finances.config.JwtService;
-import com.mindspark.family_finances.controllers.auth.AuthenticationRequest;
-import com.mindspark.family_finances.controllers.auth.AuthenticationResponse;
-import com.mindspark.family_finances.controllers.auth.RegisterRequest;
+import com.mindspark.family_finances.exception.UserAlreadyExistsException;
+import com.mindspark.family_finances.dto.AuthenticationRequest;
+import com.mindspark.family_finances.dto.AuthenticationResponse;
+import com.mindspark.family_finances.dto.RegisterRequest;
 import com.mindspark.family_finances.model.RoleName;
 import com.mindspark.family_finances.model.User;
 import com.mindspark.family_finances.repository.UserRepository;
+import com.mindspark.family_finances.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

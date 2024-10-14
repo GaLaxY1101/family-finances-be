@@ -44,7 +44,6 @@ public class Card {
     @JoinColumn(
             name = "user_id",
             referencedColumnName = "id",
-            nullable = false,
             foreignKey = @ForeignKey(name = "fk_cards_user")
     )
     private User user;

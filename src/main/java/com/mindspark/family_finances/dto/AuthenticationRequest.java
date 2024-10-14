@@ -1,4 +1,4 @@
-package com.mindspark.family_finances.controllers.auth;
+package com.mindspark.family_finances.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

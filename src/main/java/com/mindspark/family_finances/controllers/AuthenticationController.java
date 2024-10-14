@@ -1,6 +1,9 @@
-package com.mindspark.family_finances.controllers.auth;
+package com.mindspark.family_finances.controllers;
 
-import com.mindspark.family_finances.services.authService.AuthenticationService;
+import com.mindspark.family_finances.dto.AuthenticationRequest;
+import com.mindspark.family_finances.dto.AuthenticationResponse;
+import com.mindspark.family_finances.dto.RegisterRequest;
+import com.mindspark.family_finances.services.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

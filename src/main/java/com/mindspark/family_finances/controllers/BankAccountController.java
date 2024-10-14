@@ -1,12 +1,16 @@
 package com.mindspark.family_finances.controllers;
 
+import com.mindspark.family_finances.dto.CreateBankAccountRequest;
+import com.mindspark.family_finances.dto.CreateBankAccountResponseDto;
+import com.mindspark.family_finances.dto.JoinToBankAccountRequestDto;
 import com.mindspark.family_finances.model.BankAccount;
-import com.mindspark.family_finances.model.User;
-import com.mindspark.family_finances.repository.UserRepository;
 import com.mindspark.family_finances.services.BankAccountService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -19,38 +23,27 @@ public class BankAccountController {
     private final BankAccountService bankAccountService;
 
     @PostMapping("/create")
-    public ResponseEntity<BankAccount> createBankAccount(
+    @PreAuthorize("hasAuthority('PARENT')")
+    public ResponseEntity<CreateBankAccountResponseDto> createBankAccount(
             @RequestBody CreateBankAccountRequest request,
             @AuthenticationPrincipal UserDetails userDetails){
         String email = userDetails.getUsername();
-        BankAccount createdAccount = bankAccountService.createBankAccount(request, email);
+        CreateBankAccountResponseDto createdAccount = bankAccountService.createBankAccount(request, email);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdAccount);
     }
 
-    @PostMapping("/join-request")
-    public ResponseEntity<String> requestToJoinBankAccount(
-            @RequestBody JoinRequest joinRequest,
-            @AuthenticationPrincipal UserDetails userDetails
-    ){
-        String email = userDetails.getUsername();
-        boolean requestSent = bankAccountService.sendJoinRequest(
-                email, joinRequest.getInviterEmail());
-        if (requestSent){
-            return ResponseEntity.ok("Join request sent to the account owner.");
-        }else {
-            return ResponseEntity.badRequest().body("An error occurred or the inviter does not have a bank account.");
-        }
+    @PostMapping("/join")
+    @PreAuthorize("hasAuthority('PARENT')")
+    public ResponseEntity<String> joinToBankAccount(Authentication authentication,
+                                                    @RequestBody JoinToBankAccountRequestDto requestDto) {
+        bankAccountService.sendJoinRequest(authentication, requestDto);
+        return ResponseEntity.status(200).body("Success");
     }
 
-    @GetMapping("/confirm-join")
-    public ResponseEntity<String> confirmJoinRequest(
-            @RequestBody Long bankAccountId,
-            @RequestBody String requestEmail){
-        boolean success = bankAccountService.confirmJoinRequest(bankAccountId, requestEmail);
-        if(success){
-            return ResponseEntity.ok("user added to bank account.");
-        }else{
-            return ResponseEntity.badRequest().body("Failed to add user to the bank account.");
-        }
+    @GetMapping("/accept-member/{userId}")
+    @PreAuthorize("hasAuthority('PARENT')")
+    public ResponseEntity<String> acceptMember(Authentication authentication, @PathVariable Long userId) {
+        bankAccountService.acceptUser(authentication, userId);
+        return ResponseEntity.status(200).body("User successfully added to your bank account");
     }
 }

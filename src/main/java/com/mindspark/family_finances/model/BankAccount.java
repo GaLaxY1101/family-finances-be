@@ -1,15 +1,7 @@
 package com.mindspark.family_finances.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -47,6 +39,9 @@ public class BankAccount {
     @JsonManagedReference
     private Set<User> users = new HashSet<>();
 
+    @Enumerated(EnumType.STRING)
+    private Type type;
+
     public void addUser(User user) {
         users.add(user);
         user.getBankAccounts().add(this);
@@ -77,6 +72,11 @@ public class BankAccount {
                 ", availableBalance=" + availableBalance +
                 ", totalBalance=" + totalBalance +
                 '}';
+    }
+
+    public enum Type{
+        FAMILY,
+        PERSONAL
     }
 }
 
