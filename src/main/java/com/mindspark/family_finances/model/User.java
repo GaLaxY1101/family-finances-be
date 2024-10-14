@@ -2,10 +2,7 @@ package com.mindspark.family_finances.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +15,7 @@ import java.util.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(exclude = {"bankAccounts"})
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
@@ -51,12 +49,8 @@ public class User implements UserDetails {
     private Set<BankAccount> bankAccounts = new HashSet<>();
 
     public void addBankAccount(BankAccount bankAccount) {
-        if (this.bankAccounts.isEmpty()) { // Перевірка, чи вже є акаунт
             this.bankAccounts.add(bankAccount);
-            bankAccount.getUsers().add(this); // Додаємо акаунт до користувача
-        } else {
-            throw new RuntimeException("User can only have one bank account.");
-        }
+            bankAccount.getUsers().add(this);
     }
 
     @Override
@@ -94,28 +88,4 @@ public class User implements UserDetails {
         return true;
     }
 
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof User)) return false;
-        User user = (User) o;
-        return Objects.equals(email, user.email);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(email);
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", firstname='" + firstname + '\'' +
-                ", lastname='" + lastname + '\'' +
-                ", email='" + email + '\'' +
-                ", role=" + role +
-                '}';
-    }
 }

@@ -45,7 +45,7 @@ public class BankAccount {
 
     @ManyToMany(mappedBy = "bankAccounts")
     @JsonManagedReference
-    private Set<User> users = new HashSet<>(); // Ініціалізація
+    private Set<User> users = new HashSet<>();
 
     public void addUser(User user) {
         users.add(user);
