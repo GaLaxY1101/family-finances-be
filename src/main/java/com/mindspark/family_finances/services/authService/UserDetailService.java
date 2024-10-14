@@ -1,4 +1,4 @@
-package com.mindspark.family_finances.services;
+package com.mindspark.family_finances.services.authService;
 
 import com.mindspark.family_finances.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

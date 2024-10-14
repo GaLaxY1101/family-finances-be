@@ -1,6 +1,6 @@
 package com.mindspark.family_finances.config;
 
-import com.mindspark.family_finances.services.UserDetailService;
+import com.mindspark.family_finances.services.authService.UserDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,8 +26,8 @@ public class SecurityConfig {
                 cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/home-page").permitAll()
-                        .requestMatchers("/bank-account").authenticated()
+                        .requestMatchers("/auth/**", "/home-page/**").permitAll()
+                        .requestMatchers("/bank-account/**").authenticated()
                 )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
