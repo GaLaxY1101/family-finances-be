@@ -1,10 +1,12 @@
 package com.mindspark.family_finances.controllers;
 
 import com.mindspark.family_finances.dto.*;
-import com.mindspark.family_finances.model.BankAccount;
+import com.mindspark.family_finances.model.Goal;
 import com.mindspark.family_finances.services.BankAccountService;
-import jakarta.transaction.Transactional;
+import com.mindspark.family_finances.services.GoalService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,12 +15,17 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/bank-account")
 @RequiredArgsConstructor
 public class BankAccountController {
 
     private final BankAccountService bankAccountService;
+    @Autowired
+    @Lazy
+    private GoalService goalService;
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('PARENT')")
@@ -43,6 +50,29 @@ public class BankAccountController {
     public ResponseEntity<String> acceptMember(Authentication authentication, @PathVariable Long userId) {
         bankAccountService.acceptUser(authentication, userId);
         return ResponseEntity.status(200).body("User successfully added to your bank account");
+    }
+
+    @PostMapping("/{id}/create-goal")
+    @PreAuthorize("hasAuthority('PARENT')")
+    public ResponseEntity<Goal> createGoal(
+            @PathVariable("id") Long accountId,
+            @RequestBody GoalRequest goal) {
+        Goal savedGoal = goalService.saveGoal(accountId, goal);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedGoal);
+    }
+
+    @GetMapping("/{accountId}/goals")
+    @PreAuthorize("hasAuthority('PARENT')")
+    public ResponseEntity<List<Goal>> getAllGoalsByAccountId(@PathVariable Long accountId) {
+        List<Goal> goals = goalService.getAllGoalsByAccountId(accountId);
+        return ResponseEntity.ok(goals);
+    }
+
+    @DeleteMapping("/delete-goal/{goalId}")
+    @PreAuthorize("hasAuthority('PARENT')")
+    public ResponseEntity<String> deleteGoal(@PathVariable("goalId") Long goalId){
+        goalService.deleteGoal(goalId);
+        return new ResponseEntity<>("Goal deleted and funds returned (if any)", HttpStatus.OK);
     }
 
     @PostMapping("/add-child")

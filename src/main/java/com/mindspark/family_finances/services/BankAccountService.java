@@ -4,6 +4,7 @@ import com.mindspark.family_finances.dto.*;
 import com.mindspark.family_finances.mapper.BankAccountMapper;
 import com.mindspark.family_finances.model.BankAccount;
 import com.mindspark.family_finances.model.Card;
+import com.mindspark.family_finances.model.Goal;
 import com.mindspark.family_finances.model.User;
 import com.mindspark.family_finances.repository.BankAccountRepository;
 import com.mindspark.family_finances.repository.UserRepository;
@@ -14,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -98,4 +100,5 @@ public class BankAccountService {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("You don't have family bank account"));
     }
+
 }
