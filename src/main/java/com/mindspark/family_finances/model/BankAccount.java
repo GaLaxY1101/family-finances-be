@@ -42,6 +42,9 @@ public class BankAccount {
     @Enumerated(EnumType.STRING)
     private Type type;
 
+    @Column(name = "max_goal_id", nullable = false)
+    private Long maxGoalId = 0L;
+
     public void addUser(User user) {
         users.add(user);
         user.getBankAccounts().add(this);
@@ -58,6 +61,18 @@ public class BankAccount {
         if (!(o instanceof BankAccount)) return false;
         BankAccount that = (BankAccount) o;
         return Objects.equals(id, that.id);
+    }
+
+    @OneToMany(mappedBy = "bankAccount", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Goal> goals = new HashSet<>();
+        public void addGoal(Goal goal) {
+        goals.add(goal);
+        goal.setBankAccount(this);
+    }
+
+    public void removeGoal(Goal goal) {
+        goals.remove(goal);
+        goal.setBankAccount(null);
     }
 
     @Override

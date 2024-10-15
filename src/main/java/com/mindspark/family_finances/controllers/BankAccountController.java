@@ -8,6 +8,8 @@ import com.mindspark.family_finances.model.Goal;
 import com.mindspark.family_finances.services.BankAccountService;
 import com.mindspark.family_finances.services.GoalService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,13 +18,17 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/bank-account")
 @RequiredArgsConstructor
 public class BankAccountController {
 
     private final BankAccountService bankAccountService;
-    private final GoalService goalService;
+    @Autowired
+    @Lazy
+    private GoalService goalService;
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('PARENT')")
@@ -49,10 +55,29 @@ public class BankAccountController {
         return ResponseEntity.status(200).body("User successfully added to your bank account");
     }
 
-    @PostMapping("/сreate-goal")
+    @PostMapping("/{id}/create-goal")
     @PreAuthorize("hasAuthority('PARENT')")
-    public ResponseEntity<Goal> createGoal(@RequestBody GoalRequest goal){
-        Goal savedGoal = goalService.saveGoal(goal);
-        return new ResponseEntity<>(savedGoal, HttpStatus.CREATED);
+    public ResponseEntity<Goal> createGoal(
+            @PathVariable("id") Long accountId,
+            @RequestBody GoalRequest goal) {
+        Goal savedGoal = goalService.saveGoal(accountId, goal);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(savedGoal);
     }
-}
+
+    @DeleteMapping("/delete-goal/{index}")
+    @PreAuthorize("hasAuthority('PARENT')")
+    public ResponseEntity<String> deleteGoal(
+            @PathVariable("index") Long goalId
+    ){
+        goalService.deleteGoal(goalId);
+        return new ResponseEntity<>("Goal deleted and funds returned (if any)", HttpStatus.OK);
+    }
+
+    @GetMapping("/all-goals")
+    public ResponseEntity<List<Goal>> getAllGoals(){
+        List<Goal> goals = goalService.getAllGoals();
+        return new ResponseEntity<>(goals, HttpStatus.OK);
+    }
+ }
