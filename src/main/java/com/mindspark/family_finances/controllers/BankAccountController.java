@@ -2,10 +2,11 @@ package com.mindspark.family_finances.controllers;
 
 import com.mindspark.family_finances.dto.CreateBankAccountRequest;
 import com.mindspark.family_finances.dto.CreateBankAccountResponseDto;
+import com.mindspark.family_finances.dto.GoalRequest;
 import com.mindspark.family_finances.dto.JoinToBankAccountRequestDto;
-import com.mindspark.family_finances.model.BankAccount;
+import com.mindspark.family_finances.model.Goal;
 import com.mindspark.family_finances.services.BankAccountService;
-import jakarta.transaction.Transactional;
+import com.mindspark.family_finances.services.GoalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class BankAccountController {
 
     private final BankAccountService bankAccountService;
+    private final GoalService goalService;
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('PARENT')")
@@ -45,5 +47,12 @@ public class BankAccountController {
     public ResponseEntity<String> acceptMember(Authentication authentication, @PathVariable Long userId) {
         bankAccountService.acceptUser(authentication, userId);
         return ResponseEntity.status(200).body("User successfully added to your bank account");
+    }
+
+    @PostMapping("/сreate-goal")
+    @PreAuthorize("hasAuthority('PARENT')")
+    public ResponseEntity<Goal> createGoal(@RequestBody GoalRequest goal){
+        Goal savedGoal = goalService.saveGoal(goal);
+        return new ResponseEntity<>(savedGoal, HttpStatus.CREATED);
     }
 }
