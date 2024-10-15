@@ -1,9 +1,6 @@
 package com.mindspark.family_finances.controllers;
 
-import com.mindspark.family_finances.dto.CreateBankAccountRequest;
-import com.mindspark.family_finances.dto.CreateBankAccountResponseDto;
-import com.mindspark.family_finances.dto.GoalRequest;
-import com.mindspark.family_finances.dto.JoinToBankAccountRequestDto;
+import com.mindspark.family_finances.dto.*;
 import com.mindspark.family_finances.model.Goal;
 import com.mindspark.family_finances.services.BankAccountService;
 import com.mindspark.family_finances.services.GoalService;
@@ -76,12 +73,6 @@ public class BankAccountController {
     public ResponseEntity<String> deleteGoal(@PathVariable("goalId") Long goalId){
         goalService.deleteGoal(goalId);
         return new ResponseEntity<>("Goal deleted and funds returned (if any)", HttpStatus.OK);
-    }
-
-    @GetMapping("/all-goals")
-    public ResponseEntity<List<Goal>> getAllGoals(){
-        List<Goal> goals = goalService.getAllGoals();
-        return new ResponseEntity<>(goals, HttpStatus.OK);
     }
 
     @PostMapping("/add-child")
