@@ -1,10 +1,9 @@
 package com.mindspark.family_finances.services;
 
-import com.mindspark.family_finances.dto.CreateBankAccountRequest;
-import com.mindspark.family_finances.dto.CreateBankAccountResponseDto;
-import com.mindspark.family_finances.dto.JoinToBankAccountRequestDto;
+import com.mindspark.family_finances.dto.*;
 import com.mindspark.family_finances.mapper.BankAccountMapper;
 import com.mindspark.family_finances.model.BankAccount;
+import com.mindspark.family_finances.model.Card;
 import com.mindspark.family_finances.model.User;
 import com.mindspark.family_finances.repository.BankAccountRepository;
 import com.mindspark.family_finances.repository.UserRepository;
@@ -27,6 +26,7 @@ public class BankAccountService {
     private final MailSenderService mailSenderService;
     private final CardService cardService;
     private final BankAccountMapper bankAccountMapper;
+    private final AuthenticationService authenticationService;
 
     @Transactional
     public CreateBankAccountResponseDto createBankAccount(CreateBankAccountRequest request, String email) {
@@ -74,11 +74,28 @@ public class BankAccountService {
         if (user.getBankAccounts().isEmpty()) {
             throw new RuntimeException("You don't have bank account");
         }
-        BankAccount bankAccount = user.getBankAccounts().stream()
+        BankAccount bankAccount = getFamilyBankAccountByUser(user);
+        bankAccount.addUser(requestor);
+        bankAccountRepository.save(bankAccount);
+    }
+
+    @Transactional
+    public AddChildResponseDto addChild(Authentication authentication, AddChildRequestDto request) {
+        User child = authenticationService.registerChild(request);
+        User parent = (User) authentication.getPrincipal();
+        parent = userRepository.findByEmail(parent.getEmail()).get();
+        BankAccount bankAccount = getFamilyBankAccountByUser(parent);
+        bankAccount.addUser(child);
+        bankAccountRepository.save(bankAccount);
+        Card card = cardService.createChildCard(child, bankAccount);
+        return new AddChildResponseDto(card.getId(), child.getId(), request.email(),
+                request.firstName(), request.lastName());
+    }
+
+    private BankAccount getFamilyBankAccountByUser(User user) {
+        return user.getBankAccounts().stream()
                 .filter(b -> b.getType() == BankAccount.Type.FAMILY)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("You don't have family bank account"));
-        bankAccount.addUser(requestor);
-        bankAccountRepository.save(bankAccount);
     }
 }

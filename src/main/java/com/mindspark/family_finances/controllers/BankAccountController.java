@@ -1,8 +1,6 @@
 package com.mindspark.family_finances.controllers;
 
-import com.mindspark.family_finances.dto.CreateBankAccountRequest;
-import com.mindspark.family_finances.dto.CreateBankAccountResponseDto;
-import com.mindspark.family_finances.dto.JoinToBankAccountRequestDto;
+import com.mindspark.family_finances.dto.*;
 import com.mindspark.family_finances.model.BankAccount;
 import com.mindspark.family_finances.services.BankAccountService;
 import jakarta.transaction.Transactional;
@@ -45,5 +43,12 @@ public class BankAccountController {
     public ResponseEntity<String> acceptMember(Authentication authentication, @PathVariable Long userId) {
         bankAccountService.acceptUser(authentication, userId);
         return ResponseEntity.status(200).body("User successfully added to your bank account");
+    }
+
+    @PostMapping("/add-child")
+    @PreAuthorize("hasAuthority('PARENT')")
+    public AddChildResponseDto addChild(Authentication authentication,
+                                        @RequestBody AddChildRequestDto request) {
+        return bankAccountService.addChild(authentication, request);
     }
 }
