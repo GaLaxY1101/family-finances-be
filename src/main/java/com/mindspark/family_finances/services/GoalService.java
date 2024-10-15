@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,27 +24,31 @@ public class GoalService {
     private final BankAccountRepository bankAccountRepository;
     private final CardRepository cardRepository;
 
-    public Goal saveGoal(Long bankAccountId, GoalRequest goalRequest) {
-        BankAccount bankAccount = bankAccountRepository.findById(bankAccountId)
-                .orElseThrow(() -> new EntityNotFoundException("Bank account not found"));
+    public Goal saveGoal(Long accountId, GoalRequest goalRequest) {
+        BankAccount bankAccount = bankAccountRepository.findById(accountId)
+                .orElseThrow(() -> new RuntimeException("Bank account not found"));
 
-        Long newId = bankAccount.getMaxGoalId() + 1;
-
-
+        // Перевіряємо, чи вже існує ціль
+//        if (!bankAccount.getGoals().isEmpty()) {
+//            throw new RuntimeException("Goal already exists for this bank account");
+//        }
         Goal goal = new Goal();
         goal.setName(goalRequest.getName());
         goal.setDescription(goalRequest.getDescription());
         goal.setTargetAmount(goalRequest.getTargetAmount());
         goal.setBankAccount(bankAccount);
-        goalRepository.save(goal);
-        bankAccount.setMaxGoalId(newId);
-        bankAccountRepository.save(bankAccount); // Зберегти зміни в банківському рахунку
 
+        goalRepository.save(goal);
+
+        bankAccount.addGoal(goal);
         return goal;
     }
 
-    public List<Goal> getAllGoals() {
-        return goalRepository.findAll();
+    public List<Goal> getAllGoalsByAccountId(Long accountId) {
+        BankAccount bankAccount = bankAccountRepository.findById(accountId)
+                .orElseThrow(() -> new RuntimeException("Bank account not found"));
+
+        return new ArrayList<>(bankAccount.getGoals());
     }
 
 
@@ -63,6 +68,8 @@ public class GoalService {
                 cardRepository.save(card);
             }
         }
+
+        bankAccount.removeGoal(goal);
         goalRepository.delete(goal);
     }
 }
