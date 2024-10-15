@@ -20,8 +20,8 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class BankAccountService {
 
-    @Value( "${domen}")
-    private String domen;
+    @Value( "${domain}")
+    private String domain;
     private final BankAccountRepository bankAccountRepository;
     private final UserRepository userRepository;
     private final MailSenderService mailSenderService;
@@ -60,7 +60,7 @@ public class BankAccountService {
                 .append("User with email: ").append(userSender.getEmail())
                 .append(" send request to join in your bank account.\n")
                 .append("To accept request go to: ")
-                .append(domen).append("/bank-account/accept-member/").append(userSender.getId());
+                .append(domain).append("/bank-account/accept-member/").append(userSender.getId());
 
         mailSenderService.requestToJoin(email, "Request to join bank account", String.valueOf(mailText));
     }
