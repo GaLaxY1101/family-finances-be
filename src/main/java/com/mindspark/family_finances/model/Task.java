@@ -1,6 +1,5 @@
 package com.mindspark.family_finances.model;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,12 +14,16 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tasks")
 @Data
+@ToString(exclude = {"assignee", "assigner"})
+@EqualsAndHashCode
 public class Task {
 
     @Id
@@ -67,11 +70,10 @@ public class Task {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    private enum Status{
-        NEW,
+    public enum Status {
         ACTIVE,
-        REVIEW,
-        COMPLETED,
-        CANCELLED
+        DONE,
+        ACCEPTED,
+        REJECTED
     }
 }
