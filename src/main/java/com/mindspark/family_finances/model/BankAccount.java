@@ -3,7 +3,6 @@ package com.mindspark.family_finances.model;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -42,8 +41,6 @@ public class BankAccount {
     @Enumerated(EnumType.STRING)
     private Type type;
 
-    @Column(name = "max_goal_id", nullable = false)
-    private Long maxGoalId = 0L;
 
     public void addUser(User user) {
         users.add(user);
@@ -64,16 +61,7 @@ public class BankAccount {
     }
 
     @OneToMany(mappedBy = "bankAccount", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Goal> goals = new HashSet<>();
-        public void addGoal(Goal goal) {
-        goals.add(goal);
-        goal.setBankAccount(this);
-    }
-
-    public void removeGoal(Goal goal) {
-        goals.remove(goal);
-        goal.setBankAccount(null);
-    }
+    private Set<Goal> goals;
 
     @Override
     public int hashCode() {
@@ -87,6 +75,16 @@ public class BankAccount {
                 ", availableBalance=" + availableBalance +
                 ", totalBalance=" + totalBalance +
                 '}';
+    }
+
+    public void addGoal(Goal goal) {
+        goals.add(goal);
+        goal.setBankAccount(this);
+    }
+
+    public void removeGoal(Goal goal) {
+        goals.remove(goal);
+        goal.setBankAccount(null);
     }
 
     public enum Type{

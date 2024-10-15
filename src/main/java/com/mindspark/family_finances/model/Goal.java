@@ -19,8 +19,8 @@ public class Goal {
     private Double targetAmount;
     private Double currentAmount = 0.0;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bank_account_id")
     @JsonIgnore
-    @JoinColumn(name = "bank_account_id", nullable = false)
     private BankAccount bankAccount;
 }

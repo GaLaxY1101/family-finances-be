@@ -61,23 +61,20 @@ public class BankAccountController {
             @PathVariable("id") Long accountId,
             @RequestBody GoalRequest goal) {
         Goal savedGoal = goalService.saveGoal(accountId, goal);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(savedGoal);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedGoal);
     }
 
-    @DeleteMapping("/delete-goal/{index}")
+    @GetMapping("/{accountId}/goals")
     @PreAuthorize("hasAuthority('PARENT')")
-    public ResponseEntity<String> deleteGoal(
-            @PathVariable("index") Long goalId
-    ){
+    public ResponseEntity<List<Goal>> getAllGoalsByAccountId(@PathVariable Long accountId) {
+        List<Goal> goals = goalService.getAllGoalsByAccountId(accountId);
+        return ResponseEntity.ok(goals);
+    }
+
+    @DeleteMapping("/delete-goal/{goalId}")
+    @PreAuthorize("hasAuthority('PARENT')")
+    public ResponseEntity<String> deleteGoal(@PathVariable("goalId") Long goalId){
         goalService.deleteGoal(goalId);
         return new ResponseEntity<>("Goal deleted and funds returned (if any)", HttpStatus.OK);
-    }
-
-    @GetMapping("/all-goals")
-    public ResponseEntity<List<Goal>> getAllGoals(){
-        List<Goal> goals = goalService.getAllGoals();
-        return new ResponseEntity<>(goals, HttpStatus.OK);
     }
  }
