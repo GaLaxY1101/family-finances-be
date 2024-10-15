@@ -44,7 +44,11 @@ public class BankAccount {
 
     public void addUser(User user) {
         users.add(user);
-        user.getBankAccounts().add(this);
+        if (user.getBankAccounts() == null) {
+            user.setBankAccounts(Set.of(this));
+        } else {
+            user.addBankAccount(this);
+        }
     }
 
     public void removeUser(User user) {

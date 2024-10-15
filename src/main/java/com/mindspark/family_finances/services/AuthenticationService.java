@@ -1,5 +1,6 @@
 package com.mindspark.family_finances.services;
 
+import com.mindspark.family_finances.dto.AddChildRequestDto;
 import com.mindspark.family_finances.exception.UserAlreadyExistsException;
 import com.mindspark.family_finances.dto.AuthenticationRequest;
 import com.mindspark.family_finances.dto.AuthenticationResponse;
@@ -44,6 +45,23 @@ public class AuthenticationService {
                 .builder()
                 .token(jwtToken)
                 .build();
+    }
+
+    public User registerChild(AddChildRequestDto request) {
+
+        if (userRepository.findByEmail(request.email()).isPresent()) {
+            throw new UserAlreadyExistsException("User with email already exists.");
+        }
+
+        var user = User.builder()
+                .firstname(request.firstName())
+                .lastname(request.lastName())
+                .email(request.email())
+                .password(encoder.encode(request.password()))
+                .role(RoleName.CHILD)
+                .build();
+
+        return userRepository.save(user);
     }
 
 
