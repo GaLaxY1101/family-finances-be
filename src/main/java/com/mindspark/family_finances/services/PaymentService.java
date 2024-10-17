@@ -6,15 +6,10 @@ import com.mindspark.family_finances.model.Payment;
 import com.mindspark.family_finances.model.PaymentHistory;
 import com.mindspark.family_finances.model.User;
 import com.mindspark.family_finances.repository.PaymentRepository;
-import com.mindspark.family_finances.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.naming.OperationNotSupportedException;
-import java.net.DatagramPacket;
-import java.time.LocalDateTime;
 
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -105,7 +100,7 @@ public class PaymentService {
                     
                     """, senderName, receiverName, reward );
 
-            mailSenderService.requestToJoin(
+            mailSenderService.sendMessage(
                     payment.getSender().getEmail(),
                     mailHeader,
                     mailMessage);
