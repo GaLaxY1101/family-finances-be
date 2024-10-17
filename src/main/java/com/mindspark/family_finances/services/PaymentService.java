@@ -27,6 +27,7 @@ public class PaymentService {
     private final CardService cardService;
     private final PaymentHistoryService paymentHistoryService;
     private final BankAccountService bankAccountService;
+    private final MailSenderService mailSenderService;
 
     @Transactional
     public void save(Payment payment) {
@@ -80,7 +81,34 @@ public class PaymentService {
 
         if (availableBalance < amountToSend) {
             paymentHistory.setStatus(PaymentHistory.Status.FAILED);
-            // todo send sms to father's email.
+
+            String senderName = payment.getSender().getFirstName() + " " + payment.getSender().getLastName();
+            String receiverName = payment.getReceiverCard().getUser().getFirstName() + " " + payment.getReceiverCard().getUser().getLastName();
+            Double reward = payment.getAmount();
+
+
+            String mailHeader = "Insufficient Funds for Task Reward Transfer";
+            String mailMessage = String.format("""
+                    Dear %s,
+                    
+                    We hope this message finds you well. We wanted to inform you that your child, %s, has successfully completed the task. The reward for this task is %.0f₴.
+                    
+                    However, we noticed that your current card balance is insufficient to transfer the reward amount.
+                    
+                    To ensure that your child receives their reward promptly, please consider adding funds to your card or using an alternative payment method.
+                    
+                    Thank you for your attention to this matter. If you have any questions or need assistance, feel free to reach out to our support team.
+                    
+                    Best regards,
+                    Family finances,
+                    MindSpark
+                    
+                    """, senderName, receiverName, reward );
+
+            mailSenderService.requestToJoin(
+                    payment.getSender().getEmail(),
+                    mailHeader,
+                    mailMessage);
         } else {
             senderBankAccount.setAvailableBalance(availableBalance - amountToSend);
             childCard.setBalance(childCardBalance + amountToSend);
@@ -88,4 +116,6 @@ public class PaymentService {
         }
         return paymentHistory;
     }
+
+
 }
