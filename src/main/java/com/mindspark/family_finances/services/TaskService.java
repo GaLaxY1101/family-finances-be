@@ -108,7 +108,7 @@ public class TaskService {
         User assignee = task.getAssignee();
         Card childCard = cardService.findByUserAndBankAccount(task.getAssignee(), bankAccountService.getFamilyBankAccountByUser(assigner));
 
-        Payment payment = paymentService.createPaymentToChildCard(assignee, childCard, task.getReward());
+        Payment payment = paymentService.createPaymentToChildCard(assigner, childCard, task.getReward());
         paymentService.processPayment(payment);
     }
 
