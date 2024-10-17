@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
-public class TaskRegistrationDto {
+public class AddTaskResponseDto {
 
     private Long assigneeId;
     private String name;

@@ -1,8 +1,12 @@
 package com.mindspark.family_finances.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -11,6 +15,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "bank_accounts")
+@EqualsAndHashCode(exclude = {"cards", "users"})
+@ToString(exclude = {"cards", "users"})
 @Data
 public class BankAccount {
 
@@ -35,7 +41,6 @@ public class BankAccount {
     private LocalDate createdAt;
 
     @ManyToMany(mappedBy = "bankAccounts")
-    @JsonManagedReference
     private Set<User> users = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
@@ -56,30 +61,10 @@ public class BankAccount {
         user.getBankAccounts().remove(this);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof BankAccount)) return false;
-        BankAccount that = (BankAccount) o;
-        return Objects.equals(id, that.id);
-    }
 
     @OneToMany(mappedBy = "bankAccount", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Goal> goals;
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return "BankAccount{" +
-                "id=" + id +
-                ", availableBalance=" + availableBalance +
-                ", totalBalance=" + totalBalance +
-                '}';
-    }
 
     public void addGoal(Goal goal) {
         goals.add(goal);

@@ -94,7 +94,7 @@ public class BankAccountService {
                 request.firstName(), request.lastName());
     }
 
-    private BankAccount getFamilyBankAccountByUser(User user) {
+    public BankAccount getFamilyBankAccountByUser(User user) {
         return user.getBankAccounts().stream()
                 .filter(b -> b.getType() == BankAccount.Type.FAMILY)
                 .findFirst()

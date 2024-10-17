@@ -45,10 +45,10 @@ public class PaymentHistory {
     )
     private Payment payment;
 
-    private enum Status{
+    public enum Status{
         NEW,
         PENDING,
         COMPLETED,
-        CANCELLED
+        FAILED
     }
 }

@@ -1,6 +1,9 @@
 package com.mindspark.family_finances.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -41,15 +44,12 @@ public class Card {
             nullable = false,
             foreignKey = @ForeignKey(name = "fk_cards_bankAccount")
     )
+    @JsonIgnore
     private BankAccount bankAccount;
 
-
-    @ManyToOne(
-            fetch = FetchType.LAZY
-    )
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "user_id",
-            referencedColumnName = "id",
             foreignKey = @ForeignKey(name = "fk_cards_user")
     )
     private User user;
