@@ -1,11 +1,14 @@
 package com.mindspark.family_finances.services;
 
+import com.mindspark.family_finances.dto.AddTaskRequestDto;
+import com.mindspark.family_finances.dto.AddTaskResponseDto;
 import com.mindspark.family_finances.dto.TaskDtoTiny;
-import com.mindspark.family_finances.dto.TaskRegistrationDto;
 import com.mindspark.family_finances.exception.TaskNotFoundException;
 import com.mindspark.family_finances.exception.TaskOwnershipViolationException;
 import com.mindspark.family_finances.mapper.TaskRegistrationMapper;
 import com.mindspark.family_finances.mapper.TaskTinyMapper;
+import com.mindspark.family_finances.model.Card;
+import com.mindspark.family_finances.model.Payment;
 import com.mindspark.family_finances.model.Task;
 import com.mindspark.family_finances.model.User;
 import com.mindspark.family_finances.repository.TaskRepository;
@@ -32,6 +35,10 @@ public class TaskService {
     private final TaskRegistrationMapper taskMapper;
     private final UserService userService;
     private final TaskTinyMapper taskTinyMapper;
+    private final PaymentService paymentService;
+    private final CardService cardService;
+    private final BankAccountService bankAccountService;
+    private final PaymentHistoryService paymentHistoryService;
 
     public Task findById(Long id) {
         return taskRepository.findById(id).orElseThrow(() -> {
@@ -59,7 +66,7 @@ public class TaskService {
     }
 
     @Transactional
-    public Task createTask(TaskRegistrationDto taskRegistrationDto, Authentication authentication) {
+    public AddTaskResponseDto createTask(AddTaskRequestDto taskRegistrationDto, Authentication authentication) {
         User assignee = userRepository.findById(taskRegistrationDto.getAssigneeId())
                 .orElseThrow(() -> new EntityNotFoundException("Assignee not found"));
 
@@ -73,7 +80,12 @@ public class TaskService {
         task.setAssigner(assigner);
 
         taskRepository.save(task);
-        return task;
+        return new AddTaskResponseDto(
+                assignee.getId(),
+                task.getName(),
+                task.getDescription(),
+                task.getReward(),
+                task.getDeadline());
     }
 
     @Transactional
@@ -86,6 +98,18 @@ public class TaskService {
         }
 
         task.setStatus(Task.Status.ACCEPTED);
+        sendReward(task);
+    }
+
+    @Transactional
+    public void sendReward(Task task) {
+
+        User assigner = task.getAssigner();
+        User assignee = task.getAssignee();
+        Card childCard = cardService.findByUserAndBankAccount(task.getAssignee(), bankAccountService.getFamilyBankAccountByUser(assigner));
+
+        Payment payment = paymentService.createPaymentToChildCard(assignee, childCard, task.getReward());
+        paymentService.processPayment(payment);
     }
 
     @Transactional

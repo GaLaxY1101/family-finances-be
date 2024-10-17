@@ -15,8 +15,8 @@ import java.util.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = {"bankAccounts"})
-@ToString(exclude = {"bankAccounts"})
+@EqualsAndHashCode(exclude = {"bankAccounts", "cards"})
+@ToString(exclude = {"bankAccounts", "cards"})
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
@@ -46,8 +46,10 @@ public class User implements UserDetails {
             foreignKey = @ForeignKey(name = "fk_bank_account_user_user_id"),
             inverseForeignKey = @ForeignKey(name = "fk_bank_account_user_bank_account_id")
     )
-    @JsonBackReference
     private Set<BankAccount> bankAccounts = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Card> cards;
 
     public void addBankAccount(BankAccount bankAccount) {
             this.bankAccounts.add(bankAccount);

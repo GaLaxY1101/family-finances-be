@@ -54,8 +54,8 @@ public class AuthenticationService {
         }
 
         var user = User.builder()
-                .firstname(request.firstName())
-                .lastname(request.lastName())
+                .firstName(request.firstName())
+                .lastName(request.lastName())
                 .email(request.email())
                 .password(encoder.encode(request.password()))
                 .role(RoleName.CHILD)
