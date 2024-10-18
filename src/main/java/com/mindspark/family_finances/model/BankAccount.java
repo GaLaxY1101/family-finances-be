@@ -16,7 +16,7 @@ import java.util.Set;
 @Entity
 @Table(name = "bank_accounts")
 @EqualsAndHashCode(exclude = {"cards", "users"})
-@ToString(exclude = {"cards", "users"})
+@ToString(exclude = {"cards", "users", "subscriptions"})
 @Data
 public class BankAccount {
 
@@ -46,6 +46,9 @@ public class BankAccount {
     @Enumerated(EnumType.STRING)
     private Type type;
 
+    @OneToMany(mappedBy = "bankAccount", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Subscription> subscriptions = new HashSet<>();
+
 
     public void addUser(User user) {
         users.add(user);
@@ -59,6 +62,16 @@ public class BankAccount {
     public void removeUser(User user) {
         users.remove(user);
         user.getBankAccounts().remove(this);
+    }
+
+    public void addSubscription(Subscription subscription) {
+        subscriptions.add(subscription);
+        subscription.setBankAccount(this);
+    }
+
+    public void removeSubscription(Subscription subscription) {
+        subscriptions.remove(subscription);
+        subscription.setBankAccount(null);
     }
 
 

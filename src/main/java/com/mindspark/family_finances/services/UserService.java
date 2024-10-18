@@ -20,6 +20,10 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("No such user"));
     }
 
+    public User findByEmail(String email){
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User with email: "+ email +" not found"));}
+
 
     public User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

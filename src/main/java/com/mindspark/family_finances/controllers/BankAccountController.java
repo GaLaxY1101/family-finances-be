@@ -1,9 +1,13 @@
 package com.mindspark.family_finances.controllers;
 
 import com.mindspark.family_finances.dto.*;
+import com.mindspark.family_finances.model.BankAccount;
 import com.mindspark.family_finances.model.Goal;
+import com.mindspark.family_finances.model.User;
 import com.mindspark.family_finances.services.BankAccountService;
 import com.mindspark.family_finances.services.GoalService;
+import com.mindspark.family_finances.services.SubscriptionService;
+import com.mindspark.family_finances.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -15,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
 
 @RestController
@@ -26,6 +31,8 @@ public class BankAccountController {
     @Autowired
     @Lazy
     private GoalService goalService;
+    private final UserService userService;
+    private final SubscriptionService subscriptionService;
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('PARENT')")
@@ -80,5 +87,16 @@ public class BankAccountController {
     public AddChildResponseDto addChild(Authentication authentication,
                                         @RequestBody AddChildRequestDto request) {
         return bankAccountService.addChild(authentication, request);
+    }
+
+    @PostMapping("/create-sub")
+    @PreAuthorize("hasAuthority('PARENT')")
+    public ResponseEntity<SubscriptionDto> createSubscription(
+            @RequestBody SubscriptionDto subscriptionDto,
+            @AuthenticationPrincipal User user){
+        userService.findByEmail(user.getEmail());
+        BankAccount bankAccount = (BankAccount) user.getBankAccounts();
+        SubscriptionDto createdSubscription = subscriptionService.createSubscription(bankAccount, subscriptionDto);
+        return new ResponseEntity<>(createdSubscription, HttpStatus.CREATED);
     }
 }
