@@ -34,8 +34,8 @@ public class UserRepositoryTests {
     public void givenUserObject_whenSave_thenUserIsCreated(){
         //given
         User userToSave = User.builder()
-                .firstname("Albert")
-                .lastname("Einstein")
+                .firstName("Albert")
+                .lastName("Einstein")
                 .email("alberteinstein@gmail.com")
                 .password("12345678")
                 .role(RoleName.PARENT)

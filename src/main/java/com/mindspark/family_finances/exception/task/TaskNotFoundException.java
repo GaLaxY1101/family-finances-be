@@ -1,4 +1,4 @@
-package com.mindspark.family_finances.exception;
+package com.mindspark.family_finances.exception.task;
 
 import jakarta.persistence.EntityNotFoundException;
 

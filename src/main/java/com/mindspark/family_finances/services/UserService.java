@@ -1,6 +1,6 @@
 package com.mindspark.family_finances.services;
 
-import com.mindspark.family_finances.exception.UserNotFoundException;
+import com.mindspark.family_finances.exception.user.UserNotFoundException;
 import com.mindspark.family_finances.model.User;
 import com.mindspark.family_finances.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

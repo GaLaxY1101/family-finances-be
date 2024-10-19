@@ -1,5 +1,7 @@
 package com.mindspark.family_finances.exception;
 
+import com.mindspark.family_finances.exception.task.TaskOwnershipViolationException;
+import com.mindspark.family_finances.exception.user.UserAlreadyExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

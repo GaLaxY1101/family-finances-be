@@ -1,7 +1,7 @@
 package com.mindspark.family_finances.services;
 
 import com.mindspark.family_finances.dto.AddChildRequestDto;
-import com.mindspark.family_finances.exception.UserAlreadyExistsException;
+import com.mindspark.family_finances.exception.user.UserAlreadyExistsException;
 import com.mindspark.family_finances.dto.AuthenticationRequest;
 import com.mindspark.family_finances.dto.AuthenticationResponse;
 import com.mindspark.family_finances.dto.RegisterRequest;

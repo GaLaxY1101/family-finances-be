@@ -1,12 +1,16 @@
 package com.mindspark.family_finances.services;
 
 import com.mindspark.family_finances.dto.CreateRegularPaymentDto;
+import com.mindspark.family_finances.exception.payment.PaymentProcessException;
+import com.mindspark.family_finances.exception.payment.ReceiverNotFoundException;
+import com.mindspark.family_finances.mapper.PaymentMapper;
 import com.mindspark.family_finances.model.BankAccount;
 import com.mindspark.family_finances.model.Card;
 import com.mindspark.family_finances.model.Payment;
 import com.mindspark.family_finances.model.PaymentDetails;
 import com.mindspark.family_finances.model.PaymentHistory;
 import com.mindspark.family_finances.model.User;
+import com.mindspark.family_finances.repository.PaymentDetailsRepository;
 import com.mindspark.family_finances.repository.PaymentRepository;
 import com.mindspark.family_finances.repository.UserRepository;
 import java.time.Instant;
@@ -25,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 public class PaymentService {
+    private final PaymentMapper paymentMapper;
+    private final PaymentDetailsRepository paymentDetailsRepository;
     private final TaskScheduler taskScheduler;
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
@@ -67,6 +73,7 @@ public class PaymentService {
     }
 
     private PaymentHistory processToBankAccountPayment(Payment payment) {
+        //todo
         throw new UnsupportedOperationException();
     }
 
@@ -122,33 +129,50 @@ public class PaymentService {
 
 
     public void createRegularPayment(Authentication authentication, CreateRegularPaymentDto paymentDto) {
-        // todo: 1. Check if the regular payment exist, depends on the result process payment or create and after process
+        if (paymentDto.receiverCardId() == null && paymentDto.receiverBandAccountId() == null) {
+            throw new ReceiverNotFoundException("Can't find receiver.");
+        }
         User user = (User) authentication.getPrincipal();
         user = userRepository.findByEmail(user.getEmail()).get();
-        PaymentDetails paymentDetails = new PaymentDetails();
-//        paymentRepository.save();
-//
-//        taskScheduler.schedule(() -> processRegularPayment(), paymentDto.firstTimeOfPayment());
+
+        Payment payment = paymentMapper.toPayment(paymentDto);
+        PaymentDetails paymentDetails = paymentMapper.toPaymentDetails(paymentDto);
+        paymentDetails.setPayment(payment);
+        payment.setPaymentDetails(paymentDetails);
+        payment.setSender(user);
+        Payment savedPayment = paymentRepository.save(payment);
+
+
+        taskScheduler.schedule(() -> processRegularPayment(payment.getId()),
+                calculateNextExecutionDate(paymentDetails));
     }
 
     private void processRegularPayment(Long paymentId) {
         Payment payment = paymentRepository.getReferenceById(paymentId);
-
-        taskScheduler.schedule(() -> processRegularPayment(paymentId), calculateNextExecutionDelay(payment));
+        if (payment.getReceiverCard() != null) {
+            processToChildCardPayment(payment);
+        } else if (payment.getReceiverBankAccount() != null) {
+            processToBankAccountPayment(payment);
+        } else {
+            throw new PaymentProcessException("Can't process regular payment. Receiver couldn't be founded");
+        }
+        PaymentDetails paymentDetails = payment.getPaymentDetails();
+        paymentDetails.setLastPayment(LocalDateTime.now());
+        paymentDetailsRepository.save(paymentDetails);
+        taskScheduler.schedule(() -> processRegularPayment(paymentId), calculateNextExecutionDate(paymentDetails));
     }
 
-    private Date calculateNextExecutionDelay(Payment payment) {
-        LocalDateTime nextPaymentDate = null;
-        LocalDateTime lastPaymentDate = payment.getPaymentDetails().getLastPayment();
+    private Date calculateNextExecutionDate(PaymentDetails payment) {
+        LocalDateTime nextPaymentDate;
+        LocalDateTime lastPaymentDate = payment.getLastPayment();
 
-        nextPaymentDate = switch (payment.getPaymentDetails().getFrequency()) {
+        nextPaymentDate = switch (payment.getFrequency()) {
             case DAILY -> lastPaymentDate.plusDays(1);
             case WEEKLY -> lastPaymentDate.plusWeeks(1);
             case MONTHLY -> lastPaymentDate.plusMonths(1);
             case YEARLY -> lastPaymentDate.plusYears(1);
         };
         Instant instant = nextPaymentDate.atZone(ZoneId.systemDefault()).toInstant();
-        // Convert Instant to Date
         return Date.from(instant);
     }
 }
