@@ -1,10 +1,10 @@
 package com.mindspark.family_finances.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
@@ -24,7 +24,7 @@ public class PaymentDetails {
 
 
     @MapsId
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(
             name = "id",
             nullable = false,
@@ -39,7 +39,7 @@ public class PaymentDetails {
     @Enumerated(EnumType.STRING)
     private Frequency frequency;
 
-    private enum Frequency{
+    public enum Frequency{
         DAILY,
         WEEKLY,
         MONTHLY,

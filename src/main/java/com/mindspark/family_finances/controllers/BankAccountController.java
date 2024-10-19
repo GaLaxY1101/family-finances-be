@@ -4,6 +4,7 @@ import com.mindspark.family_finances.dto.*;
 import com.mindspark.family_finances.model.Goal;
 import com.mindspark.family_finances.services.BankAccountService;
 import com.mindspark.family_finances.services.GoalService;
+import com.mindspark.family_finances.services.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -23,6 +24,7 @@ import java.util.List;
 public class BankAccountController {
 
     private final BankAccountService bankAccountService;
+    private final PaymentService paymentService;
     @Autowired
     @Lazy
     private GoalService goalService;
@@ -80,5 +82,12 @@ public class BankAccountController {
     public AddChildResponseDto addChild(Authentication authentication,
                                         @RequestBody AddChildRequestDto request) {
         return bankAccountService.addChild(authentication, request);
+    }
+
+    @PostMapping("/create-regular-payment")
+    @PreAuthorize("hasAuthority('PARENT')")
+    public void createRegularPayment(Authentication authentication,
+            @RequestBody CreateRegularPaymentDto paymentDto) {
+        paymentService.createRegularPayment(authentication, paymentDto);
     }
 }

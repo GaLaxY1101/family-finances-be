@@ -1,13 +1,22 @@
 package com.mindspark.family_finances.services;
 
+import com.mindspark.family_finances.dto.CreateRegularPaymentDto;
 import com.mindspark.family_finances.model.BankAccount;
 import com.mindspark.family_finances.model.Card;
 import com.mindspark.family_finances.model.Payment;
+import com.mindspark.family_finances.model.PaymentDetails;
 import com.mindspark.family_finances.model.PaymentHistory;
 import com.mindspark.family_finances.model.User;
 import com.mindspark.family_finances.repository.PaymentRepository;
+import com.mindspark.family_finances.repository.UserRepository;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,10 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 public class PaymentService {
-
+    private final TaskScheduler taskScheduler;
     private final PaymentRepository paymentRepository;
-    private final UserService userService;
-    private final CardService cardService;
+    private final UserRepository userRepository;
     private final PaymentHistoryService paymentHistoryService;
     private final BankAccountService bankAccountService;
     private final MailSenderService mailSenderService;
@@ -113,4 +121,34 @@ public class PaymentService {
     }
 
 
+    public void createRegularPayment(Authentication authentication, CreateRegularPaymentDto paymentDto) {
+        // todo: 1. Check if the regular payment exist, depends on the result process payment or create and after process
+        User user = (User) authentication.getPrincipal();
+        user = userRepository.findByEmail(user.getEmail()).get();
+        PaymentDetails paymentDetails = new PaymentDetails();
+//        paymentRepository.save();
+//
+//        taskScheduler.schedule(() -> processRegularPayment(), paymentDto.firstTimeOfPayment());
+    }
+
+    private void processRegularPayment(Long paymentId) {
+        Payment payment = paymentRepository.getReferenceById(paymentId);
+
+        taskScheduler.schedule(() -> processRegularPayment(paymentId), calculateNextExecutionDelay(payment));
+    }
+
+    private Date calculateNextExecutionDelay(Payment payment) {
+        LocalDateTime nextPaymentDate = null;
+        LocalDateTime lastPaymentDate = payment.getPaymentDetails().getLastPayment();
+
+        nextPaymentDate = switch (payment.getPaymentDetails().getFrequency()) {
+            case DAILY -> lastPaymentDate.plusDays(1);
+            case WEEKLY -> lastPaymentDate.plusWeeks(1);
+            case MONTHLY -> lastPaymentDate.plusMonths(1);
+            case YEARLY -> lastPaymentDate.plusYears(1);
+        };
+        Instant instant = nextPaymentDate.atZone(ZoneId.systemDefault()).toInstant();
+        // Convert Instant to Date
+        return Date.from(instant);
+    }
 }
