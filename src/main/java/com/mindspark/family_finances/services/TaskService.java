@@ -105,7 +105,6 @@ public class TaskService {
     public void sendReward(Task task) {
 
         User assigner = task.getAssigner();
-        User assignee = task.getAssignee();
         Card childCard = cardService.findByUserAndBankAccount(task.getAssignee(), bankAccountService.getFamilyBankAccountByUser(assigner));
 
         Payment payment = paymentService.createPaymentToChildCard(assigner, childCard, task.getReward());
