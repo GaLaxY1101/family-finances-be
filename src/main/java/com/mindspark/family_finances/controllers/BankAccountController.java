@@ -1,10 +1,15 @@
 package com.mindspark.family_finances.controllers;
 
 import com.mindspark.family_finances.dto.*;
+import com.mindspark.family_finances.dto.bankaccount.CreateBankAccountRequest;
+import com.mindspark.family_finances.dto.bankaccount.CreateBankAccountResponseDto;
+import com.mindspark.family_finances.dto.bankaccount.JoinToBankAccountRequestDto;
 import com.mindspark.family_finances.model.Goal;
 import com.mindspark.family_finances.services.BankAccountService;
 import com.mindspark.family_finances.services.GoalService;
 import com.mindspark.family_finances.services.PaymentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -21,16 +26,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/bank-account")
 @RequiredArgsConstructor
+@Tag(name = "Bank account controller",
+        description = "Here we have endpoints for bank account management")
 public class BankAccountController {
-
     private final BankAccountService bankAccountService;
     private final PaymentService paymentService;
-    @Autowired
-    @Lazy
-    private GoalService goalService;
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('PARENT')")
+    @Operation(summary = "Create bank account",
+            description = "Only authenticated used could create bank account")
     public ResponseEntity<CreateBankAccountResponseDto> createBankAccount(
             @RequestBody CreateBankAccountRequest request,
             @AuthenticationPrincipal UserDetails userDetails){
@@ -41,6 +46,8 @@ public class BankAccountController {
 
     @PostMapping("/join")
     @PreAuthorize("hasAuthority('PARENT')")
+    @Operation(summary = "Join to bank account",
+            description = "Join to existing bank account via owner`s e-mail")
     public ResponseEntity<String> joinToBankAccount(Authentication authentication,
                                                     @RequestBody JoinToBankAccountRequestDto requestDto) {
         bankAccountService.sendJoinRequest(authentication, requestDto);
@@ -49,36 +56,17 @@ public class BankAccountController {
 
     @GetMapping("/accept-member/{userId}")
     @PreAuthorize("hasAuthority('PARENT')")
+    @Operation(summary = "Accept bank account`s member",
+            description = "Endpoint for accepting request to join the bank account")
     public ResponseEntity<String> acceptMember(Authentication authentication, @PathVariable Long userId) {
         bankAccountService.acceptUser(authentication, userId);
         return ResponseEntity.status(200).body("User successfully added to your bank account");
     }
 
-    @PostMapping("/{id}/create-goal")
-    @PreAuthorize("hasAuthority('PARENT')")
-    public ResponseEntity<Goal> createGoal(
-            @PathVariable("id") Long accountId,
-            @RequestBody GoalRequest goal) {
-        Goal savedGoal = goalService.saveGoal(accountId, goal);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedGoal);
-    }
-
-    @GetMapping("/{accountId}/goals")
-    @PreAuthorize("hasAuthority('PARENT')")
-    public ResponseEntity<List<Goal>> getAllGoalsByAccountId(@PathVariable Long accountId) {
-        List<Goal> goals = goalService.getAllGoalsByAccountId(accountId);
-        return ResponseEntity.ok(goals);
-    }
-
-    @DeleteMapping("/delete-goal/{goalId}")
-    @PreAuthorize("hasAuthority('PARENT')")
-    public ResponseEntity<String> deleteGoal(@PathVariable("goalId") Long goalId){
-        goalService.deleteGoal(goalId);
-        return new ResponseEntity<>("Goal deleted and funds returned (if any)", HttpStatus.OK);
-    }
-
     @PostMapping("/add-child")
     @PreAuthorize("hasAuthority('PARENT')")
+    @Operation(summary = "Add child",
+            description = "Register child and add to bank account")
     public AddChildResponseDto addChild(Authentication authentication,
                                         @RequestBody AddChildRequestDto request) {
         return bankAccountService.addChild(authentication, request);
@@ -86,6 +74,8 @@ public class BankAccountController {
 
     @PostMapping("/create-regular-payment")
     @PreAuthorize("hasAuthority('PARENT')")
+    @Operation(summary = "Create regular payment",
+            description = "Create regular payment with providing first time of payment and frequency")
     public void createRegularPayment(Authentication authentication,
             @RequestBody CreateRegularPaymentDto paymentDto) {
         paymentService.createRegularPayment(authentication, paymentDto);

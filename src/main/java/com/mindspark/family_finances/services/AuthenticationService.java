@@ -2,9 +2,9 @@ package com.mindspark.family_finances.services;
 
 import com.mindspark.family_finances.dto.AddChildRequestDto;
 import com.mindspark.family_finances.exception.user.UserAlreadyExistsException;
-import com.mindspark.family_finances.dto.AuthenticationRequest;
-import com.mindspark.family_finances.dto.AuthenticationResponse;
-import com.mindspark.family_finances.dto.RegisterRequest;
+import com.mindspark.family_finances.dto.auth.AuthenticationRequest;
+import com.mindspark.family_finances.dto.auth.AuthenticationResponse;
+import com.mindspark.family_finances.dto.auth.RegisterRequest;
 import com.mindspark.family_finances.model.RoleName;
 import com.mindspark.family_finances.model.User;
 import com.mindspark.family_finances.repository.UserRepository;

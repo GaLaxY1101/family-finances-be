@@ -1,6 +1,6 @@
 package com.mindspark.family_finances.mapper;
 
-import com.mindspark.family_finances.dto.TaskDtoTiny;
+import com.mindspark.family_finances.dto.task.TaskResponseDto;
 import com.mindspark.family_finances.model.Task;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -11,7 +11,7 @@ public interface TaskTinyMapper {
 
     @Mapping(target = "assignerFullName", source = "task", qualifiedByName = "mapAssignerFullName")
     @Mapping(target = "assigneeFullName", source = "task", qualifiedByName = "mapAssigneeFullName")
-    TaskDtoTiny toDto(Task task);
+    TaskResponseDto toDto(Task task);
 
     @Named("mapAssignerFullName")
     default String mapAssignerFullName(Task task) {

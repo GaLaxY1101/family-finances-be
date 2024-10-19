@@ -1,13 +1,12 @@
-package com.mindspark.family_finances.dto;
+package com.mindspark.family_finances.dto.task;
 
 import com.mindspark.family_finances.model.Task;
 import lombok.Data;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-public class TaskDtoTiny {
+public class TaskResponseDto {
 
     private String name;
     private String assignerFullName;

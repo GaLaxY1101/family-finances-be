@@ -1,12 +1,12 @@
 package com.mindspark.family_finances.controllers;
 
-import com.mindspark.family_finances.dto.AddTaskResponseDto;
-import com.mindspark.family_finances.dto.TaskDtoTiny;
-import com.mindspark.family_finances.dto.AddTaskRequestDto;
+import com.mindspark.family_finances.dto.task.AddTaskResponseDto;
+import com.mindspark.family_finances.dto.task.TaskResponseDto;
+import com.mindspark.family_finances.dto.task.AddTaskRequestDto;
 import com.mindspark.family_finances.model.Task;
-import com.mindspark.family_finances.services.PaymentService;
 import com.mindspark.family_finances.services.TaskService;
-import com.mindspark.family_finances.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,15 +28,15 @@ import java.util.Set;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/tasks")
+@Tag(name = "Task controller",
+        description = "Here we have endpoints for task management")
 public class TasksController {
-
     private final TaskService taskService;
-    private final UserService userService;
-    private final PaymentService paymentService;
-
 
     @PostMapping("/create-task")
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create task",
+            description = "Create task endpoint")
     public AddTaskResponseDto createTask(@Valid @RequestBody AddTaskRequestDto taskRegistrationDto,
                                          Authentication authentication
     ) {
@@ -44,6 +44,9 @@ public class TasksController {
     }
 
     @PatchMapping("/accept-task/{task_id}")
+    @Operation(summary = "Accept task",
+            description = "Endpoint for parents. Parent can accept competed task" +
+                    "Task status will be changed to accepted")
     public ResponseEntity<String> acceptTask(@PathVariable(name = "task_id") Long taskId
     ) {
         taskService.acceptTask(taskId);
@@ -51,6 +54,9 @@ public class TasksController {
     }
 
     @PatchMapping("/reject-task/{task_id}")
+    @Operation(summary = "Accept task",
+            description = "Endpoint for parents. Parent can reject competed task." +
+                    "Task status will be changed to rejected")
     public ResponseEntity<String> rejectTask(@PathVariable(name = "task_id") Long taskId) {
 
         taskService.rejectTask(taskId);
@@ -58,6 +64,9 @@ public class TasksController {
     }
 
     @PatchMapping("/mark-as-done/{task_id}")
+    @Operation(summary = "Mark task as done",
+            description = "Endpoint for child. Child can mark task as competed." +
+                    "Task status will be changed to completed")
     public ResponseEntity<String> markTaskAsDone(@PathVariable(name = "task_id") Long taskId) {
 
         taskService.markAsDone(taskId);
@@ -65,9 +74,11 @@ public class TasksController {
     }
 
     @GetMapping("/{status}")
-    public ResponseEntity<Set<TaskDtoTiny>> getTasksByStatus(@PathVariable Task.Status status) {
+    @Operation(summary = "Get all task",
+            description = "Get all task by status")
+    public ResponseEntity<Set<TaskResponseDto>> getTasksByStatus(@PathVariable Task.Status status) {
 
-        Set<TaskDtoTiny> tasks = taskService.findAllByStatus(status);
+        Set<TaskResponseDto> tasks = taskService.findAllByStatus(status);
         return ResponseEntity.ok(tasks);
     }
 }

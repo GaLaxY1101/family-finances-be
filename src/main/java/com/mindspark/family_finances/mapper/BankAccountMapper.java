@@ -1,6 +1,6 @@
 package com.mindspark.family_finances.mapper;
 
-import com.mindspark.family_finances.dto.CreateBankAccountResponseDto;
+import com.mindspark.family_finances.dto.bankaccount.CreateBankAccountResponseDto;
 import com.mindspark.family_finances.model.BankAccount;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;

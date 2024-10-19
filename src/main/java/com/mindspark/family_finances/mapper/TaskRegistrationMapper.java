@@ -1,6 +1,6 @@
 package com.mindspark.family_finances.mapper;
 
-import com.mindspark.family_finances.dto.AddTaskRequestDto;
+import com.mindspark.family_finances.dto.task.AddTaskRequestDto;
 import com.mindspark.family_finances.model.Task;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;

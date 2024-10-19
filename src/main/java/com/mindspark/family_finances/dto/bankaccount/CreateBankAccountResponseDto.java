@@ -1,4 +1,4 @@
-package com.mindspark.family_finances.dto;
+package com.mindspark.family_finances.dto.bankaccount;
 
 import java.time.LocalDate;
 

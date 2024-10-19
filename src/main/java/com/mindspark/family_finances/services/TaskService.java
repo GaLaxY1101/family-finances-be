@@ -1,8 +1,8 @@
 package com.mindspark.family_finances.services;
 
-import com.mindspark.family_finances.dto.AddTaskRequestDto;
-import com.mindspark.family_finances.dto.AddTaskResponseDto;
-import com.mindspark.family_finances.dto.TaskDtoTiny;
+import com.mindspark.family_finances.dto.task.AddTaskRequestDto;
+import com.mindspark.family_finances.dto.task.AddTaskResponseDto;
+import com.mindspark.family_finances.dto.task.TaskResponseDto;
 import com.mindspark.family_finances.exception.task.TaskNotFoundException;
 import com.mindspark.family_finances.exception.task.TaskOwnershipViolationException;
 import com.mindspark.family_finances.mapper.TaskRegistrationMapper;
@@ -136,7 +136,7 @@ public class TaskService {
         task.setStatus(Task.Status.DONE);
     }
 
-    public Set<TaskDtoTiny> findAllByStatus(Task.Status status) {
+    public Set<TaskResponseDto> findAllByStatus(Task.Status status) {
         return taskRepository.findAllByStatus(status)
                 .stream()
                 .map(taskTinyMapper::toDto)

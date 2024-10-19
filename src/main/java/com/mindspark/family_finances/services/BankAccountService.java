@@ -1,6 +1,9 @@
 package com.mindspark.family_finances.services;
 
 import com.mindspark.family_finances.dto.*;
+import com.mindspark.family_finances.dto.bankaccount.CreateBankAccountRequest;
+import com.mindspark.family_finances.dto.bankaccount.CreateBankAccountResponseDto;
+import com.mindspark.family_finances.dto.bankaccount.JoinToBankAccountRequestDto;
 import com.mindspark.family_finances.exception.BankAccountDoesNotExistException;
 import com.mindspark.family_finances.exception.user.UserNotFoundException;
 import com.mindspark.family_finances.mapper.BankAccountMapper;
