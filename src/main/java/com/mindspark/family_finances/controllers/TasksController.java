@@ -37,10 +37,12 @@ public class TasksController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create task",
             description = "Create task endpoint")
-    public AddTaskResponseDto createTask(@Valid @RequestBody AddTaskRequestDto taskRegistrationDto,
+    public ResponseEntity<AddTaskResponseDto> createTask(@Valid @RequestBody AddTaskRequestDto taskRegistrationDto,
                                          Authentication authentication
     ) {
-        return taskService.createTask(taskRegistrationDto, authentication);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(taskService.createTask(taskRegistrationDto, authentication));
     }
 
     @PatchMapping("/accept-task/{task_id}")
@@ -50,7 +52,9 @@ public class TasksController {
     public ResponseEntity<String> acceptTask(@PathVariable(name = "task_id") Long taskId
     ) {
         taskService.acceptTask(taskId);
-        return ResponseEntity.ok("Task accepted successfully");
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body("Task accepted successfully");
     }
 
     @PatchMapping("/reject-task/{task_id}")
@@ -60,7 +64,9 @@ public class TasksController {
     public ResponseEntity<String> rejectTask(@PathVariable(name = "task_id") Long taskId) {
 
         taskService.rejectTask(taskId);
-        return ResponseEntity.ok("Task reject successfully");
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body("Task reject successfully");
     }
 
     @PatchMapping("/mark-as-done/{task_id}")
@@ -70,7 +76,9 @@ public class TasksController {
     public ResponseEntity<String> markTaskAsDone(@PathVariable(name = "task_id") Long taskId) {
 
         taskService.markAsDone(taskId);
-        return ResponseEntity.ok("Task marked as done successfully");
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body("Task marked as done successfully");
     }
 
     @GetMapping("/{status}")
@@ -79,6 +87,8 @@ public class TasksController {
     public ResponseEntity<Set<TaskResponseDto>> getTasksByStatus(@PathVariable Task.Status status) {
 
         Set<TaskResponseDto> tasks = taskService.findAllByStatus(status);
-        return ResponseEntity.ok(tasks);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(tasks);
     }
 }

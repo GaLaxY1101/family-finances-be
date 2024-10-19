@@ -34,16 +34,17 @@ public class GoalController {
             @PathVariable Long accountId,
             @RequestBody GoalRequest goal) {
         Goal savedGoal = goalService.saveGoal(accountId, goal);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedGoal);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(savedGoal);
     }
 
     @GetMapping("/{accountId}")
     @PreAuthorize("hasAuthority('PARENT')")
     @Operation(summary = "Get all goals",
             description = "Get all bank account`s goals")
-    public ResponseEntity<List<Goal>> getAllGoalsByAccountId(@PathVariable Long accountId) {
-        List<Goal> goals = goalService.getAllGoalsByAccountId(accountId);
-        return ResponseEntity.ok(goals);
+    public List<Goal> getAllGoalsByAccountId(@PathVariable Long accountId) {
+        return goalService.getAllGoalsByAccountId(accountId);
     }
 
     @DeleteMapping("/delete/{goalId}")
@@ -52,6 +53,8 @@ public class GoalController {
             description = "Delete goal by id")
     public ResponseEntity<String> deleteGoal(@PathVariable Long goalId){
         goalService.deleteGoal(goalId);
-        return new ResponseEntity<>("Goal deleted and funds returned (if any)", HttpStatus.OK);
+        return ResponseEntity
+                .status(200)
+                .body("Goal deleted and funds returned (if any)");
     }
 }

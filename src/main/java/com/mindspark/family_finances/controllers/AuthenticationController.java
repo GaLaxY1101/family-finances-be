@@ -7,6 +7,7 @@ import com.mindspark.family_finances.services.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +28,9 @@ public class AuthenticationController {
             description = "Register new user")
     public ResponseEntity<AuthenticationResponse> register(
             @RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(authService.register(request));
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(authService.register(request));
     }
 
     @PostMapping("/authenticate")
@@ -35,6 +38,8 @@ public class AuthenticationController {
             description = "Login by email and password")
     public ResponseEntity<AuthenticationResponse> authentication(
             @RequestBody AuthenticationRequest request) {
-        return ResponseEntity.ok(authService.authenticate(request));
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(authService.authenticate(request));
     }
 }

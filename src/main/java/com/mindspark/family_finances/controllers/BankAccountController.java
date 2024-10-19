@@ -41,7 +41,9 @@ public class BankAccountController {
             @AuthenticationPrincipal UserDetails userDetails){
         String email = userDetails.getUsername();
         CreateBankAccountResponseDto createdAccount = bankAccountService.createBankAccount(request, email);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdAccount);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(createdAccount);
     }
 
     @PostMapping("/join")
@@ -51,7 +53,9 @@ public class BankAccountController {
     public ResponseEntity<String> joinToBankAccount(Authentication authentication,
                                                     @RequestBody JoinToBankAccountRequestDto requestDto) {
         bankAccountService.sendJoinRequest(authentication, requestDto);
-        return ResponseEntity.status(200).body("Success");
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body("Join request was successfully sent");
     }
 
     @GetMapping("/accept-member/{userId}")
@@ -60,24 +64,31 @@ public class BankAccountController {
             description = "Endpoint for accepting request to join the bank account")
     public ResponseEntity<String> acceptMember(Authentication authentication, @PathVariable Long userId) {
         bankAccountService.acceptUser(authentication, userId);
-        return ResponseEntity.status(200).body("User successfully added to your bank account");
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body("User successfully added to your bank account");
     }
 
     @PostMapping("/add-child")
     @PreAuthorize("hasAuthority('PARENT')")
     @Operation(summary = "Add child",
             description = "Register child and add to bank account")
-    public AddChildResponseDto addChild(Authentication authentication,
+    public ResponseEntity<AddChildResponseDto> addChild(Authentication authentication,
                                         @RequestBody AddChildRequestDto request) {
-        return bankAccountService.addChild(authentication, request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(bankAccountService.addChild(authentication, request));
     }
 
     @PostMapping("/create-regular-payment")
     @PreAuthorize("hasAuthority('PARENT')")
     @Operation(summary = "Create regular payment",
             description = "Create regular payment with providing first time of payment and frequency")
-    public void createRegularPayment(Authentication authentication,
+    public ResponseEntity<String> createRegularPayment(Authentication authentication,
             @RequestBody CreateRegularPaymentDto paymentDto) {
         paymentService.createRegularPayment(authentication, paymentDto);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body("Regular payment created successfully");
     }
 }
