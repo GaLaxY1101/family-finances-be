@@ -25,7 +25,7 @@ public class ApplicationConfig {
     @Bean
     public TaskScheduler taskScheduler() {
         ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
-        taskScheduler.setPoolSize(5); // You can set the thread pool size
+        taskScheduler.setPoolSize(5);
         taskScheduler.setThreadNamePrefix("TaskScheduler-");
         taskScheduler.initialize();
         return taskScheduler;
@@ -54,6 +54,4 @@ public class ApplicationConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
-
-
 }

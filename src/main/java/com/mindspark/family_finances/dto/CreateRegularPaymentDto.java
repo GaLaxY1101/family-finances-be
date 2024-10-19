@@ -1,5 +1,6 @@
 package com.mindspark.family_finances.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.mindspark.family_finances.model.PaymentDetails;
 import java.time.LocalDateTime;
 import javax.validation.constraints.NotNull;
@@ -9,6 +10,6 @@ public record CreateRegularPaymentDto(
         Long receiverCardId,
         Long receiverBandAccountId,
         @NotNull PaymentDetails.Frequency frequency,
-        @NotNull LocalDateTime firstTimeOfPayment
+        @NotNull @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss.SSS")LocalDateTime firstTimeOfPayment
 ) {
 }

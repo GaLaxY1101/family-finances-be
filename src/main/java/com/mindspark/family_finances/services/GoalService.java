@@ -1,6 +1,7 @@
 package com.mindspark.family_finances.services;
 
 import com.mindspark.family_finances.dto.GoalRequest;
+import com.mindspark.family_finances.exception.BankAccountDoesNotExistException;
 import com.mindspark.family_finances.model.BankAccount;
 import com.mindspark.family_finances.model.Card;
 import com.mindspark.family_finances.model.Goal;
@@ -26,12 +27,7 @@ public class GoalService {
 
     public Goal saveGoal(Long accountId, GoalRequest goalRequest) {
         BankAccount bankAccount = bankAccountRepository.findById(accountId)
-                .orElseThrow(() -> new RuntimeException("Bank account not found"));
-
-        // Перевіряємо, чи вже існує ціль
-//        if (!bankAccount.getGoals().isEmpty()) {
-//            throw new RuntimeException("Goal already exists for this bank account");
-//        }
+                .orElseThrow(() -> new BankAccountDoesNotExistException("Bank account not found"));
         Goal goal = new Goal();
         goal.setName(goalRequest.getName());
         goal.setDescription(goalRequest.getDescription());
@@ -46,12 +42,10 @@ public class GoalService {
 
     public List<Goal> getAllGoalsByAccountId(Long accountId) {
         BankAccount bankAccount = bankAccountRepository.findById(accountId)
-                .orElseThrow(() -> new RuntimeException("Bank account not found"));
+                .orElseThrow(() -> new BankAccountDoesNotExistException("Bank account not found"));
 
         return new ArrayList<>(bankAccount.getGoals());
     }
-
-
 
     public void deleteGoal(Long goalId) {
         Goal goal = goalRepository.findById(goalId)

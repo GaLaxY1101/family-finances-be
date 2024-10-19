@@ -8,6 +8,7 @@ import com.mindspark.family_finances.model.BankAccount;
 import com.mindspark.family_finances.model.Card;
 import com.mindspark.family_finances.model.Payment;
 import com.mindspark.family_finances.model.PaymentDetails;
+import com.mindspark.family_finances.model.PaymentDetails.Frequency;
 import com.mindspark.family_finances.model.PaymentHistory;
 import com.mindspark.family_finances.model.User;
 import com.mindspark.family_finances.repository.PaymentDetailsRepository;
@@ -127,7 +128,7 @@ public class PaymentService {
         return paymentHistory;
     }
 
-
+    @Transactional
     public void createRegularPayment(Authentication authentication, CreateRegularPaymentDto paymentDto) {
         if (paymentDto.receiverCardId() == null && paymentDto.receiverBandAccountId() == null) {
             throw new ReceiverNotFoundException("Can't find receiver.");
@@ -137,9 +138,11 @@ public class PaymentService {
 
         Payment payment = paymentMapper.toPayment(paymentDto);
         PaymentDetails paymentDetails = paymentMapper.toPaymentDetails(paymentDto);
+        paymentDetails.setLastPayment(calculateLastExecutionDate(paymentDto.firstTimeOfPayment(), paymentDetails.getFrequency()));
         paymentDetails.setPayment(payment);
         payment.setPaymentDetails(paymentDetails);
         payment.setSender(user);
+        payment.setRegular(true);
         Payment savedPayment = paymentRepository.save(payment);
 
 
@@ -174,5 +177,14 @@ public class PaymentService {
         };
         Instant instant = nextPaymentDate.atZone(ZoneId.systemDefault()).toInstant();
         return Date.from(instant);
+    }
+
+    private LocalDateTime calculateLastExecutionDate(LocalDateTime dateTime, Frequency frequency) {
+        return switch (frequency) {
+            case DAILY -> dateTime.minusDays(1);
+            case WEEKLY -> dateTime.minusWeeks(1);
+            case MONTHLY -> dateTime.minusMonths(1);
+            case YEARLY -> dateTime.minusYears(1);
+        };
     }
 }

@@ -1,6 +1,8 @@
 package com.mindspark.family_finances.services;
 
 import com.mindspark.family_finances.dto.*;
+import com.mindspark.family_finances.exception.BankAccountDoesNotExistException;
+import com.mindspark.family_finances.exception.user.UserNotFoundException;
 import com.mindspark.family_finances.mapper.BankAccountMapper;
 import com.mindspark.family_finances.model.BankAccount;
 import com.mindspark.family_finances.model.Card;
@@ -31,7 +33,7 @@ public class BankAccountService {
     @Transactional
     public CreateBankAccountResponseDto createBankAccount(CreateBankAccountRequest request, String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
 
         BankAccount bankAccount = new BankAccount();
         bankAccount.setAvailableBalance(request.getAvailableBalance());
@@ -50,10 +52,10 @@ public class BankAccountService {
     public void sendJoinRequest(Authentication authentication, JoinToBankAccountRequestDto requestDto) {
         String email = requestDto.email();
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
         User userSender = (User) authentication.getPrincipal();
         if (user.getBankAccounts().isEmpty()) {
-            throw new RuntimeException("User with such email don't have bank account");
+            throw new BankAccountDoesNotExistException("User with such email don't have bank account");
         }
 
         StringBuilder mailText = new StringBuilder()
@@ -70,9 +72,9 @@ public class BankAccountService {
         User user = (User) authentication.getPrincipal();
         user = userRepository.findByEmail(user.getEmail()).get();
         User requestor = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
         if (user.getBankAccounts().isEmpty()) {
-            throw new RuntimeException("You don't have bank account");
+            throw new BankAccountDoesNotExistException("You don't have bank account");
         }
         BankAccount bankAccount = getFamilyBankAccountByUser(user);
         bankAccount.addUser(requestor);
@@ -96,7 +98,7 @@ public class BankAccountService {
         return user.getBankAccounts().stream()
                 .filter(b -> b.getType() == BankAccount.Type.FAMILY)
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("You don't have family bank account"));
+                .orElseThrow(() -> new BankAccountDoesNotExistException("You don't have family bank account"));
     }
 
 }
